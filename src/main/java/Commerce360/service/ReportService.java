@@ -133,7 +133,7 @@ public class ReportService {
                                                 .orElse(0.0),
                                 "topSuppliers", purchases.stream()
                                                 .collect(Collectors.groupingBy(
-                                                                t -> t.getSupplier().getName(),
+                                                                t -> t.getSupplier().getCompanyName(),
                                                                 Collectors.summingDouble(
                                                                                 Transaction::getTotalAmount))));
 

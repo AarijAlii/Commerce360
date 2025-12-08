@@ -74,6 +74,6 @@ public class SupplierService {
     }
 
     public Page<Supplier> searchSuppliers(String query, Pageable pageable) {
-        return supplierRepository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(query, query, pageable);
+        return supplierRepository.findByCompanyNameContainingIgnoreCaseOrEmailContainingIgnoreCase(query, query, pageable);
     }
 }

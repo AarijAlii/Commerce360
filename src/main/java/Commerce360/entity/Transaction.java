@@ -56,4 +56,11 @@ public class Transaction {
 
     @Column
     private String referenceNumber; // For purchase orders or sales receipts
+
+    @Column
+    private UUID orderId; // Link to Order or PurchaseOrder ID
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private OrderType orderType; // CUSTOMER_ORDER, PURCHASE_ORDER, MANUAL
 }
