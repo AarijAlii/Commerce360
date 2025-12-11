@@ -13,12 +13,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin Panel", description = "Admin-only endpoints for user management, approvals, and platform analytics")
 public class AdminController {
 
     @Autowired
@@ -27,11 +34,12 @@ public class AdminController {
     // ========== User Management ==========
 
     @GetMapping("/users")
+    @Operation(summary = "List All Users", description = "Get paginated list of all users with sorting options")
     public ResponseEntity<Page<UserDTO>> getAllUsers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "registrationDate") String sortBy,
-            @RequestParam(defaultValue = "DESC") String sortDir) {
+            @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size") @RequestParam(defaultValue = "20") int size,
+            @Parameter(description = "Sort field") @RequestParam(defaultValue = "registrationDate") String sortBy,
+            @Parameter(description = "Sort direction (ASC/DESC)") @RequestParam(defaultValue = "DESC") String sortDir) {
 
         Sort sort = sortDir.equalsIgnoreCase("ASC") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
@@ -107,7 +115,14 @@ public class AdminController {
     }
 
     @PutMapping("/users/{userId}/approve")
-    public ResponseEntity<UserDTO> approveUser(@PathVariable UUID userId) {
+    @Operation(summary = "Approve User", description = "Approve a pending supplier or store manager. Tracks who approved and when.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User approved successfully"),
+            @ApiResponse(responseCode = "400", description = "User already approved or cannot be approved"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    public ResponseEntity<UserDTO> approveUser(
+            @Parameter(description = "User ID to approve") @PathVariable UUID userId) {
         UserDTO user = adminService.approveUser(userId);
         return ResponseEntity.ok(user);
     }
@@ -124,6 +139,7 @@ public class AdminController {
     // ========== Platform Analytics ==========
 
     @GetMapping("/statistics/platform")
+    @Operation(summary = "Get Platform Statistics", description = "Get comprehensive platform-wide statistics including user counts, orders, products, and stores")
     public ResponseEntity<Map<String, Object>> getPlatformStatistics() {
         Map<String, Object> stats = adminService.getPlatformStatistics();
         return ResponseEntity.ok(stats);

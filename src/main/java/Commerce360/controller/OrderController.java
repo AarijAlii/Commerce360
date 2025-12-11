@@ -13,10 +13,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/orders")
+@Tag(name = "Customer Orders (B2C)", description = "Customer order lifecycle management - place, track, rate")
 public class OrderController {
 
     @Autowired
@@ -24,13 +31,19 @@ public class OrderController {
 
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
+    @Operation(summary = "Place Order", description = "Convert cart to order. Automatically reserves inventory and marks cart as converted.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order placed successfully"),
+            @ApiResponse(responseCode = "400", description = "Cart invalid or insufficient stock"),
+            @ApiResponse(responseCode = "404", description = "Cart not found")
+    })
     public ResponseEntity<OrderDTO> placeOrder(
-            @RequestParam UUID cartId,
-            @RequestParam String shippingAddress,
-            @RequestParam String shippingCity,
-            @RequestParam String shippingPostalCode,
-            @RequestParam String contactPhone,
-            @RequestParam(required = false) String notes) {
+            @Parameter(description = "Cart ID to convert") @RequestParam UUID cartId,
+            @Parameter(description = "Shipping address") @RequestParam String shippingAddress,
+            @Parameter(description = "Shipping city") @RequestParam String shippingCity,
+            @Parameter(description = "Shipping postal code") @RequestParam String shippingPostalCode,
+            @Parameter(description = "Contact phone number") @RequestParam String contactPhone,
+            @Parameter(description = "Optional delivery notes") @RequestParam(required = false) String notes) {
 
         OrderDTO order = orderService.placeOrder(
                 cartId, shippingAddress, shippingCity, shippingPostalCode, contactPhone, notes);
@@ -60,7 +73,8 @@ public class OrderController {
 
     @PutMapping("/{id}/deliver")
     @PreAuthorize("hasRole('STORE_MANAGER') or hasRole('ADMIN')")
-    public ResponseEntity<OrderDTO> markAsDelivered(@PathVariable UUID id) {
+    @Operation(summary = "Mark Order as Delivered", description = "Mark order as delivered. **AUTOMATICALLY updates inventory** (reduces stock, releases reserved quantity) and creates transaction.")
+    public ResponseEntity<OrderDTO> markAsDelivered(@Parameter(description = "Order ID") @PathVariable UUID id) {
         OrderDTO order = orderService.markAsDelivered(id);
         return ResponseEntity.ok(order);
     }
@@ -117,10 +131,16 @@ public class OrderController {
 
     @PostMapping("/{orderId}/rate")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @Operation(summary = "Rate Store", description = "Rate a store after order delivery. **Automatically calculates average rating**. Only delivered orders can be rated.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Rating submitted successfully"),
+            @ApiResponse(responseCode = "400", description = "Order not delivered or already rated"),
+            @ApiResponse(responseCode = "404", description = "Order not found")
+    })
     public ResponseEntity<StoreRatingDTO> rateStore(
-            @PathVariable UUID orderId,
-            @RequestParam Integer rating,
-            @RequestParam(required = false) String review) {
+            @Parameter(description = "Order ID") @PathVariable UUID orderId,
+            @Parameter(description = "Rating (1-5)") @RequestParam Integer rating,
+            @Parameter(description = "Optional review text") @RequestParam(required = false) String review) {
 
         StoreRatingDTO storeRating = orderService.rateStore(orderId, rating, review);
         return ResponseEntity.ok(storeRating);

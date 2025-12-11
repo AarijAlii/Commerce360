@@ -18,9 +18,18 @@ import Commerce360.security.LoginRequest;
 import Commerce360.security.RefreshRequest;
 import Commerce360.security.AuthResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication", description = "User authentication and token management endpoints")
 public class AuthController {
 
     // AUTHENTICATION MANAGER
@@ -28,8 +37,14 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
-    // LOGIN
     @PostMapping("/login")
+    @Operation(summary = "User Login", description = "Authenticate user with email and password. Returns JWT access token and refresh token.", tags = {
+            "Authentication" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login successful", content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials")
+    })
+    @SecurityRequirement(name = "")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             authenticationManager.authenticate(
@@ -45,8 +60,15 @@ public class AuthController {
         }
     }
 
-    // REFRESH TOKEN
     @PostMapping("/refresh")
+    @Operation(summary = "Refresh Access Token", description = "Get new access and refresh tokens using a valid refresh token.", tags = {
+            "Authentication" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Token refreshed successfully", content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid refresh token"),
+            @ApiResponse(responseCode = "401", description = "Refresh token expired")
+    })
+    @SecurityRequirement(name = "")
     public ResponseEntity<?> refresh(@RequestBody RefreshRequest request) {
         try {
             String refreshToken = request.getRefreshToken();

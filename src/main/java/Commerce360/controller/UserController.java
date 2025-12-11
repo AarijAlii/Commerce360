@@ -11,6 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import lombok.Data;
 
 import java.util.List;
@@ -19,6 +24,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
+@Tag(name = "User Management", description = "User registration, profile, and approval management")
 public class UserController {
     @Autowired
     private final UserService userService;
@@ -45,7 +51,10 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody RegistrationRequest request) {
+    @Operation(summary = "Register User", description = "Register supplier or store manager. Status: PENDING (requires admin approval). For customers use /api/customers/register.")
+    @SecurityRequirement(name = "")
+    public ResponseEntity<UserDTO> registerUser(
+            @Parameter(description = "Registration details") @RequestBody RegistrationRequest request) {
         User registeredUser = userService.registerUser(request.getEmail(), request.getPassword(), request.getRole(),
                 request.getFirstName(), request.getLastName());
         return ResponseEntity.ok(UserDTO.fromEntity(registeredUser));

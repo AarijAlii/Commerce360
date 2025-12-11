@@ -7,11 +7,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/cart")
+@Tag(name = "Shopping Cart (B2C)", description = "Multi-store shopping cart management for customers")
 public class CartController {
 
     @Autowired
@@ -19,11 +24,12 @@ public class CartController {
 
     @PostMapping("/add")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @Operation(summary = "Add Product to Cart", description = "Add product to cart for specific store. Validates inventory availability.")
     public ResponseEntity<CartDTO> addToCart(
-            @RequestParam UUID customerId,
-            @RequestParam UUID storeId,
-            @RequestParam UUID productId,
-            @RequestParam Integer quantity) {
+            @Parameter(description = "Customer ID") @RequestParam UUID customerId,
+            @Parameter(description = "Store ID") @RequestParam UUID storeId,
+            @Parameter(description = "Product ID") @RequestParam UUID productId,
+            @Parameter(description = "Quantity") @RequestParam Integer quantity) {
 
         CartDTO cart = cartService.addToCart(customerId, storeId, productId, quantity);
         return ResponseEntity.ok(cart);

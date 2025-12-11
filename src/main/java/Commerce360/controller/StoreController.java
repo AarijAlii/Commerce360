@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import lombok.Data;
 
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/stores")
+@Tag(name = "Stores", description = "Store management and ownership assignment")
 public class StoreController {
     @Autowired
     private final StoreService storeService;
@@ -26,8 +30,8 @@ public class StoreController {
         this.storeService = storeService;
     }
 
-    // GET ALL STORES
     @GetMapping
+    @Operation(summary = "List All Stores", description = "Get list of all stores with ratings")
     public ResponseEntity<List<StoreDTO>> getAllStores() {
         List<StoreDTO> stores = storeService.getAllStores().stream()
                 .map(StoreDTO::fromEntity)

@@ -42,6 +42,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**", "/api/users/register").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/actuator/metrics/**").permitAll()
+                        
+                        // Swagger UI and OpenAPI endpoints
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/swagger-resources/**", "/webjars/**").permitAll()
 
                         // Inventory - ADMIN and STORE_MANAGER
                         .requestMatchers("/api/inventory/**").hasAnyRole("ADMIN", "STORE_MANAGER")

@@ -10,11 +10,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/supplier-products")
+@Tag(name = "Supplier Products (B2B)", description = "Supplier product catalog for B2B procurement")
 public class SupplierProductController {
 
     @Autowired
@@ -32,9 +36,9 @@ public class SupplierProductController {
             @RequestParam(required = false) Integer leadTimeDays,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) String imageUrl) {
-        
+
         SupplierProductDTO supplierProduct = supplierProductService.addProductToSupplierCatalog(
-                supplierId, productId, supplierSku, supplierPrice, 
+                supplierId, productId, supplierSku, supplierPrice,
                 minimumOrderQuantity, stockAvailable, leadTimeDays, description, imageUrl);
         return ResponseEntity.ok(supplierProduct);
     }
@@ -47,25 +51,26 @@ public class SupplierProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDir) {
-        
+
         Sort sort = sortDir.equalsIgnoreCase("ASC") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         PageRequest pageRequest = PageRequest.of(page, size, sort);
-        
+
         Page<SupplierProductDTO> products = supplierProductService.getSupplierProducts(
                 supplierId, activeOnly, pageRequest);
         return ResponseEntity.ok(products);
     }
 
     @GetMapping("/available")
+    @Operation(summary = "Browse Available Supplier Products", description = "Browse all active products available from suppliers for B2B procurement")
     public ResponseEntity<Page<SupplierProductDTO>> getAllAvailableProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDir) {
-        
+
         Sort sort = sortDir.equalsIgnoreCase("ASC") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         PageRequest pageRequest = PageRequest.of(page, size, sort);
-        
+
         Page<SupplierProductDTO> products = supplierProductService.getAllAvailableProducts(pageRequest);
         return ResponseEntity.ok(products);
     }
@@ -86,7 +91,7 @@ public class SupplierProductController {
             @RequestParam(required = false) Boolean isActive,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) String imageUrl) {
-        
+
         SupplierProductDTO supplierProduct = supplierProductService.updateSupplierProduct(
                 id, supplierPrice, stockAvailable, leadTimeDays, isActive, description, imageUrl);
         return ResponseEntity.ok(supplierProduct);

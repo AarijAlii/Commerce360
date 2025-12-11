@@ -13,10 +13,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/purchase-orders")
+@Tag(name = "Purchase Orders (B2B)", description = "Store Manager ↔ Supplier purchase order workflow")
 public class PurchaseOrderController {
 
     @Autowired
@@ -24,7 +31,12 @@ public class PurchaseOrderController {
 
     @PostMapping
     @PreAuthorize("hasRole('STORE_MANAGER')")
-    public ResponseEntity<PurchaseOrderDTO> createPurchaseOrder(@RequestBody CreatePurchaseOrderRequest request) {
+    @Operation(
+        summary = "Create Purchase Order",
+        description = "Create new purchase order in DRAFT status. Store manager orders from supplier."
+    )
+    public ResponseEntity<PurchaseOrderDTO> createPurchaseOrder(
+            @Parameter(description = "Purchase order details") @RequestBody CreatePurchaseOrderRequest request) {
         PurchaseOrderDTO purchaseOrder = purchaseOrderService.createPurchaseOrder(request);
         return ResponseEntity.ok(purchaseOrder);
     }
@@ -38,7 +50,12 @@ public class PurchaseOrderController {
 
     @PutMapping("/{id}/approve")
     @PreAuthorize("hasRole('SUPPLIER')")
-    public ResponseEntity<PurchaseOrderDTO> approvePurchaseOrder(@PathVariable UUID id) {
+    @Operation(
+        summary = "Approve Purchase Order",
+        description = "Supplier approves order. Reserves stock for this order."
+    )
+    public ResponseEntity<PurchaseOrderDTO> approvePurchaseOrder(
+            @Parameter(description = "Purchase order ID") @PathVariable UUID id) {
         PurchaseOrderDTO purchaseOrder = purchaseOrderService.approvePurchaseOrder(id);
         return ResponseEntity.ok(purchaseOrder);
     }
@@ -59,7 +76,17 @@ public class PurchaseOrderController {
 
     @PutMapping("/{id}/receive")
     @PreAuthorize("hasRole('STORE_MANAGER')")
-    public ResponseEntity<PurchaseOrderDTO> receiveShipment(@PathVariable UUID id) {
+    @Operation(
+        summary = "Receive Shipment",
+        description = "Mark purchase order as received. **AUTOMATICALLY updates store inventory** (adds stock) and creates transaction."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Shipment received, inventory updated"),
+        @ApiResponse(responseCode = "400", description = "Order not shipped yet"),
+        @ApiResponse(responseCode = "404", description = "Purchase order not found")
+    })
+    public ResponseEntity<PurchaseOrderDTO> receiveShipment(
+            @Parameter(description = "Purchase order ID") @PathVariable UUID id) {
         PurchaseOrderDTO purchaseOrder = purchaseOrderService.receiveShipment(id);
         return ResponseEntity.ok(purchaseOrder);
     }
