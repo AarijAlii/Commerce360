@@ -43,6 +43,19 @@ public class Inventory {
     @Column
     private String notes;
 
+    @Column
+    @Builder.Default
+    private Integer reservedQuantity = 0; // Quantity reserved for pending customer orders
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "purchase_order_id")
+    private PurchaseOrder purchaseOrder; // Track which PO stocked this inventory
+
+    // Calculated field: available = quantity - reserved
+    public Integer getAvailableQuantity() {
+        return quantity - (reservedQuantity != null ? reservedQuantity : 0);
+    }
+
     public Inventory(Store store, Product product, int quantity) {
         this.store = store;
         this.product = product;

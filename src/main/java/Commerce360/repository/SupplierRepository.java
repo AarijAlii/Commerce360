@@ -11,6 +11,6 @@ import java.util.UUID;
 
 @Repository
 public interface SupplierRepository extends JpaRepository<Supplier, UUID> {
-    Page<Supplier> findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(String name, String email,
+    Page<Supplier> findByCompanyNameContainingIgnoreCaseOrEmailContainingIgnoreCase(String name, String email,
             Pageable pageable);
 }

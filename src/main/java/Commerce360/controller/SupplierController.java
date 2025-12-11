@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import Commerce360.entity.Supplier;
 import Commerce360.service.SupplierService;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/suppliers")
+@Tag(name = "Suppliers", description = "Supplier profile management and directory")
 public class SupplierController {
 
     @Autowired

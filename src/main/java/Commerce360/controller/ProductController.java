@@ -13,11 +13,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.UUID;
 
 //PRODUCT CONTROLLER GLOBAL PRODUCT CATALOG
 @RestController
 @RequestMapping("/api/products")
+@Tag(name = "Products", description = "Global product catalog - browse, search, and manage products")
 public class ProductController {
     @Autowired
     private final ProductService productService;
@@ -40,8 +44,8 @@ public class ProductController {
         }
     }
 
-    // GET ALL PRODUCTS
     @GetMapping
+    @Operation(summary = "List All Products", description = "Get paginated list of all products with optional sorting")
     public ResponseEntity<Page<ProductDTO>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

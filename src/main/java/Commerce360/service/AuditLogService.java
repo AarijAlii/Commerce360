@@ -62,7 +62,24 @@ public class AuditLogService {
 
         auditLogRepository.save(auditLog);
     }
-
+@Transactional
+public void logAction(User user, Store store, String action, String entityType, UUID entityId, String details) {
+    ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+    String ipAddress = attributes != null ? attributes.getRequest().getRemoteAddr() : "unknown";
+    String userAgent = attributes != null ? attributes.getRequest().getHeader("User-Agent") : "unknown";
+    AuditLog auditLog = AuditLog.builder()
+            .timestamp(LocalDateTime.now())
+            .user(user)
+            .store(store)
+            .action(action)
+            .entityType(entityType)
+            .entityId(entityId)
+            .details(details)
+            .ipAddress(ipAddress)
+            .userAgent(userAgent)
+            .build();
+    auditLogRepository.save(auditLog);
+}
     public Page<AuditLogDTO> getAllAuditLogs(Pageable pageable) {
         return auditLogRepository.findAll(pageable)
                 .map(AuditLogDTO::fromEntity);

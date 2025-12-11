@@ -32,4 +32,17 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "supplier_id")
     private Supplier supplier;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column
+    private String imageUrl;
+
+    @Column
+    private String brand;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isAvailableToCustomers = true;
 }

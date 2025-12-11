@@ -44,7 +44,7 @@ public class TransactionDTO {
                 .batchNumber(transaction.getBatchNumber())
                 .notes(transaction.getNotes())
                 .supplierId(transaction.getSupplier() != null ? transaction.getSupplier().getId() : null)
-                .supplierName(transaction.getSupplier() != null ? transaction.getSupplier().getName() : null)
+                .supplierName(transaction.getSupplier() != null ? transaction.getSupplier().getCompanyName() : null)
                 .referenceNumber(transaction.getReferenceNumber())
                 .build();
     }
