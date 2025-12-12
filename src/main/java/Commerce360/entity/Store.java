@@ -25,7 +25,7 @@ public class Store {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;
+    private StoreManager owner; // Changed from User to StoreManager
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -61,4 +61,3 @@ public class Store {
     @Column
     private LocalDateTime updatedAt;
 }
-

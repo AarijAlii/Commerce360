@@ -1,7 +1,6 @@
 package Commerce360.controller;
 
 import Commerce360.entity.Store;
-import Commerce360.entity.User;
 import Commerce360.service.StoreService;
 import Commerce360.dto.StoreDTO;
 import Commerce360.dto.UserDTO;
@@ -31,25 +30,33 @@ public class StoreController {
     }
 
     @GetMapping
-    @Operation(summary = "List All Stores", description = "Get list of all stores with ratings")
+    @Operation(
+        summary = "List All Stores",
+        description = "Get list of all stores with ratings (Authenticated users only)"
+    )
     public ResponseEntity<List<StoreDTO>> getAllStores() {
-        List<StoreDTO> stores = storeService.getAllStores().stream()
-                .map(StoreDTO::fromEntity)
-                .collect(Collectors.toList());
+        List<StoreDTO> stores = storeService.getAllStores();
         return ResponseEntity.ok(stores);
     }
 
     // GET STORE BY ID
     @GetMapping("/{id}")
+    @Operation(
+        summary = "Get Store by ID",
+        description = "Get detailed store information including owner and location (Authenticated users only)"
+    )
     public ResponseEntity<StoreDTO> getStoreById(@PathVariable UUID id) {
         return storeService.getStoreById(id)
-                .map(StoreDTO::fromEntity)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     // CREATE A STORE
     @PostMapping
+    @Operation(
+        summary = "Create Store",
+        description = "Create a new store. Owner automatically set from current user (STORE_MANAGER or ADMIN only)"
+    )
     public ResponseEntity<?> createStore(@RequestBody StoreCreationRequest request) {
         try {
             Store store = Store.builder()
@@ -57,13 +64,8 @@ public class StoreController {
                     .location(request.getLocation())
                     .build();
 
-            // If owner is specified in the request, set it
-            if (request.getOwner() != null && request.getOwner().getId() != null) {
-                User owner = new User();
-                owner.setId(request.getOwner().getId());
-                store.setOwner(owner);
-            }
-
+            // Owner is automatically set by StoreService.createStore() from current user
+            
             Store createdStore = storeService.createStore(store);
             return ResponseEntity.ok(StoreDTO.fromEntity(createdStore));
         } catch (RuntimeException e) {
@@ -73,6 +75,10 @@ public class StoreController {
 
     // UPDATE A STORE
     @PutMapping("/{id}")
+    @Operation(
+        summary = "Update Store",
+        description = "Update store details (name, location). Must be store owner or ADMIN"
+    )
     public ResponseEntity<?> updateStore(@PathVariable UUID id, @RequestBody StoreUpdateRequest request) {
         try {
             Store store = Store.builder()
@@ -89,6 +95,10 @@ public class StoreController {
 
     // DELETE A STORE
     @DeleteMapping("/{id}")
+    @Operation(
+        summary = "Delete Store",
+        description = "Delete a store. Must be store owner or ADMIN"
+    )
     public ResponseEntity<?> deleteStore(@PathVariable UUID id) {
         try {
             storeService.deleteStore(id);
@@ -100,6 +110,10 @@ public class StoreController {
 
     // ASSIGN STORE OWNER
     @PutMapping("/{id}/assign-owner")
+    @Operation(
+        summary = "Assign Store Owner",
+        description = "Transfer store ownership to another user (ADMIN only)"
+    )
     public ResponseEntity<StoreDTO> assignStoreOwner(@PathVariable UUID id,
             @RequestBody OwnerAssignmentRequest request) {
         try {
@@ -112,19 +126,23 @@ public class StoreController {
 
     // GET STORES BY OWNER
     @GetMapping("/owned/{ownerId}")
+    @Operation(
+        summary = "Get Stores by Owner ID",
+        description = "Get all stores owned by a specific user/store manager (Authenticated users only)"
+    )
     public ResponseEntity<List<StoreDTO>> getStoresByOwner(@PathVariable UUID ownerId) {
-        List<StoreDTO> stores = storeService.getStoresByOwner(ownerId).stream()
-                .map(StoreDTO::fromEntity)
-                .collect(Collectors.toList());
+        List<StoreDTO> stores = storeService.getStoresByOwner(ownerId);
         return ResponseEntity.ok(stores);
     }
 
     // GET STORES FOR CURRENT USER
     @GetMapping("/my-stores")
+    @Operation(
+        summary = "Get My Stores",
+        description = "Get all stores owned by the currently logged-in user (STORE_MANAGER only)"
+    )
     public ResponseEntity<List<StoreDTO>> getStoresForCurrentUser() {
-        List<StoreDTO> stores = storeService.getStoresForCurrentUser().stream()
-                .map(StoreDTO::fromEntity)
-                .collect(Collectors.toList());
+        List<StoreDTO> stores = storeService.getStoresForCurrentUser();
         return ResponseEntity.ok(stores);
     }
 }
@@ -133,7 +151,6 @@ public class StoreController {
 class StoreCreationRequest {
     private String name;
     private String location;
-    private UserDTO owner;
 }
 
 @Data

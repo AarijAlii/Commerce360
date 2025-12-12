@@ -238,16 +238,15 @@ public class InventoryService {
                 Store store = storeRepository.findById(storeId)
                                 .orElseThrow(() -> new RuntimeException("Store not found"));
 
-                // Check if user is store owner, manager, or admin
+                // Check if user is store owner or admin
                 UUID currentUserId = securityContextUtil.getCurrentUserId();
                 User currentUser = securityContextUtil.getCurrentUser().get();
 
-                boolean isOwner = store.getOwner().getId().equals(currentUserId);
-                boolean isManager = currentUser.getManagedStores().contains(store);
+                boolean isOwner = store.getOwner().getUser().getId().equals(currentUserId);
                 boolean isAdmin = currentUser.getRole().equals(UserRole.ADMIN);
 
-                if (!isOwner && !isManager && !isAdmin) {
-                        throw new RuntimeException("You can only view inventory for your own or managed stores");
+                if (!isOwner && !isAdmin) {
+                        throw new RuntimeException("You can only view inventory for your own stores");
                 }
 
                 return inventoryRepository.findAll(
@@ -262,16 +261,15 @@ public class InventoryService {
                 Store store = storeRepository.findById(storeId)
                                 .orElseThrow(() -> new RuntimeException("Store not found"));
 
-                // Check if user is store owner, manager, or admin
+                // Check if user is store owner or admin
                 UUID currentUserId = securityContextUtil.getCurrentUserId();
                 User currentUser = securityContextUtil.getCurrentUser().get();
 
-                boolean isOwner = store.getOwner().getId().equals(currentUserId);
-                boolean isManager = currentUser.getManagedStores().contains(store);
+                boolean isOwner = store.getOwner().getUser().getId().equals(currentUserId);
                 boolean isAdmin = currentUser.getRole().equals(UserRole.ADMIN);
 
-                if (!isOwner && !isManager && !isAdmin) {
-                        throw new RuntimeException("You can only view inventory for your own or managed stores");
+                if (!isOwner && !isAdmin) {
+                        throw new RuntimeException("You can only view expiring inventory for your own stores");
                 }
 
                 return inventoryRepository.findAll(

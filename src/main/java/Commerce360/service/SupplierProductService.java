@@ -4,9 +4,11 @@ import Commerce360.dto.SupplierProductDTO;
 import Commerce360.entity.Product;
 import Commerce360.entity.Supplier;
 import Commerce360.entity.SupplierProduct;
+import Commerce360.entity.User;
 import Commerce360.repository.ProductRepository;
 import Commerce360.repository.SupplierProductRepository;
 import Commerce360.repository.SupplierRepository;
+import Commerce360.security.SecurityContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,9 @@ public class SupplierProductService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private SecurityContextUtil securityContextUtil;
 
     @Transactional
     public SupplierProductDTO addProductToSupplierCatalog(UUID supplierId, UUID productId,
@@ -145,5 +150,25 @@ public class SupplierProductService {
         supplierProduct.setStockAvailable(newStock);
         supplierProduct.setUpdatedAt(LocalDateTime.now());
         supplierProductRepository.save(supplierProduct);
+    }
+
+    /**
+     * Get products for currently logged-in supplier
+     */
+    public Page<SupplierProductDTO> getMyProducts(Boolean activeOnly, Pageable pageable) {
+        User currentUser = securityContextUtil.getCurrentUser()
+                .orElseThrow(() -> new RuntimeException("Not authenticated"));
+        
+        Supplier supplier = supplierRepository.findByUser(currentUser)
+                .orElseThrow(() -> new RuntimeException("Supplier profile not found"));
+
+        Page<SupplierProduct> products;
+        if (activeOnly != null && activeOnly) {
+            products = supplierProductRepository.findBySupplierAndIsActive(supplier, true, pageable);
+        } else {
+            products = supplierProductRepository.findBySupplier(supplier, pageable);
+        }
+
+        return products.map(SupplierProductDTO::fromEntity);
     }
 }

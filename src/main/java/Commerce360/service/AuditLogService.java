@@ -13,7 +13,6 @@ import Commerce360.dto.AuditLogDTO;
 import Commerce360.entity.AuditLog;
 import Commerce360.entity.Store;
 import Commerce360.entity.User;
-import Commerce360.entity.UserRole;
 import Commerce360.repository.AuditLogRepository;
 import Commerce360.security.SecurityContextUtil;
 
@@ -43,10 +42,9 @@ public class AuditLogService {
         String ipAddress = attributes != null ? attributes.getRequest().getRemoteAddr() : "unknown";
         String userAgent = attributes != null ? attributes.getRequest().getHeader("User-Agent") : "unknown";
 
+        // Store will be set by the specific logAction overload that includes store
+        // parameter
         Store userStore = null;
-        if (currentUser.getRole() == UserRole.STORE_MANAGER && !currentUser.getManagedStores().isEmpty()) {
-            userStore = currentUser.getManagedStores().get(0);
-        }
 
         AuditLog auditLog = AuditLog.builder()
                 .timestamp(LocalDateTime.now())
@@ -62,24 +60,26 @@ public class AuditLogService {
 
         auditLogRepository.save(auditLog);
     }
-@Transactional
-public void logAction(User user, Store store, String action, String entityType, UUID entityId, String details) {
-    ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-    String ipAddress = attributes != null ? attributes.getRequest().getRemoteAddr() : "unknown";
-    String userAgent = attributes != null ? attributes.getRequest().getHeader("User-Agent") : "unknown";
-    AuditLog auditLog = AuditLog.builder()
-            .timestamp(LocalDateTime.now())
-            .user(user)
-            .store(store)
-            .action(action)
-            .entityType(entityType)
-            .entityId(entityId)
-            .details(details)
-            .ipAddress(ipAddress)
-            .userAgent(userAgent)
-            .build();
-    auditLogRepository.save(auditLog);
-}
+
+    @Transactional
+    public void logAction(User user, Store store, String action, String entityType, UUID entityId, String details) {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        String ipAddress = attributes != null ? attributes.getRequest().getRemoteAddr() : "unknown";
+        String userAgent = attributes != null ? attributes.getRequest().getHeader("User-Agent") : "unknown";
+        AuditLog auditLog = AuditLog.builder()
+                .timestamp(LocalDateTime.now())
+                .user(user)
+                .store(store)
+                .action(action)
+                .entityType(entityType)
+                .entityId(entityId)
+                .details(details)
+                .ipAddress(ipAddress)
+                .userAgent(userAgent)
+                .build();
+        auditLogRepository.save(auditLog);
+    }
+
     public Page<AuditLogDTO> getAllAuditLogs(Pageable pageable) {
         return auditLogRepository.findAll(pageable)
                 .map(AuditLogDTO::fromEntity);

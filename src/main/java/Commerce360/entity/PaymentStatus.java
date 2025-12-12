@@ -1,10 +1,10 @@
 package Commerce360.entity;
 
 public enum PaymentStatus {
-    PENDING, // Payment not yet processed
+    PENDING, // Payment intent created, awaiting payment
     PROCESSING, // Payment is being processed
-    COMPLETED, // Payment successful
+    REQUIRES_ACTION, // 3D Secure authentication required
+    SUCCEEDED, // Payment completed successfully
     FAILED, // Payment failed
-    REFUNDED, // Payment refunded
-    CANCELLED // Payment cancelled
+    CANCELED // Payment canceled
 }

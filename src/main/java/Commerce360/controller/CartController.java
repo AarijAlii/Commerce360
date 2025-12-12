@@ -37,6 +37,7 @@ public class CartController {
 
     @PutMapping("/items/{itemId}")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @Operation(summary = "Update Cart Item Quantity", description = "Update quantity of an existing cart item (CUSTOMER only)")
     public ResponseEntity<CartDTO> updateCartItem(
             @PathVariable UUID itemId,
             @RequestParam Integer quantity) {
@@ -47,6 +48,7 @@ public class CartController {
 
     @DeleteMapping("/items/{itemId}")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @Operation(summary = "Remove Item from Cart", description = "Remove a specific item from cart (CUSTOMER only)")
     public ResponseEntity<CartDTO> removeFromCart(@PathVariable UUID itemId) {
         CartDTO cart = cartService.removeFromCart(itemId);
         return ResponseEntity.ok(cart);
@@ -54,6 +56,7 @@ public class CartController {
 
     @DeleteMapping("/{cartId}")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @Operation(summary = "Clear Cart", description = "Remove all items from cart (CUSTOMER only)")
     public ResponseEntity<Void> clearCart(@PathVariable UUID cartId) {
         cartService.clearCart(cartId);
         return ResponseEntity.ok().build();
@@ -61,6 +64,7 @@ public class CartController {
 
     @GetMapping
     @PreAuthorize("hasRole('CUSTOMER')")
+    @Operation(summary = "Get Cart for Store", description = "Get customer's cart for a specific store (CUSTOMER only)")
     public ResponseEntity<CartDTO> getCart(
             @RequestParam UUID customerId,
             @RequestParam UUID storeId) {
@@ -71,6 +75,7 @@ public class CartController {
 
     @GetMapping("/customer/{customerId}")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
+    @Operation(summary = "Get All Customer Carts", description = "Get all active carts for a customer across all stores (CUSTOMER or ADMIN)")
     public ResponseEntity<List<CartDTO>> getCustomerCarts(@PathVariable UUID customerId) {
         List<CartDTO> carts = cartService.getCustomerCarts(customerId);
         return ResponseEntity.ok(carts);

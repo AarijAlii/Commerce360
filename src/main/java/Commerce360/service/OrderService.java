@@ -58,6 +58,9 @@ public class OrderService {
     @Autowired
     private SecurityContextUtil securityContextUtil;
 
+    @Autowired
+    private StripePaymentService stripePaymentService;
+
     @Transactional
     public OrderDTO placeOrder(UUID cartId, String shippingAddress, String shippingCity,
                               String shippingPostalCode, String contactPhone, String notes) {
@@ -252,7 +255,7 @@ public class OrderService {
         }
 
         order.setStatus(OrderStatus.DELIVERED);
-        order.setPaymentStatus(PaymentStatus.COMPLETED); // Mark payment as complete
+        order.setPaymentStatus(PaymentStatus.SUCCEEDED); // Mark payment as complete
         order.setUpdatedAt(LocalDateTime.now());
         order = orderRepository.save(order);
 

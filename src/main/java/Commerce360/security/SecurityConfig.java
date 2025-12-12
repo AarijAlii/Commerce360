@@ -39,13 +39,24 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
-                        .requestMatchers("/api/auth/**", "/api/users/register").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/actuator/metrics/**").permitAll()
-                        
+
                         // Swagger UI and OpenAPI endpoints
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/swagger-resources/**", "/webjars/**").permitAll()
+
+                        // Stripe Webhooks - MUST be public for Stripe to call
+                        .requestMatchers("/api/webhooks/stripe").permitAll()
+
+                        // Role-specific registration endpoints - MUST be public
+                        .requestMatchers("/api/customers/register").permitAll()
+                        .requestMatchers("/api/suppliers/register").permitAll()
+                        .requestMatchers("/api/store-managers/register").permitAll()
+
+                        // Payment endpoints - CUSTOMER only
+                        .requestMatchers("/api/payments/**").hasAnyRole("CUSTOMER", "ADMIN", "STORE_MANAGER")
 
                         // Inventory - ADMIN and STORE_MANAGER
                         .requestMatchers("/api/inventory/**").hasAnyRole("ADMIN", "STORE_MANAGER")
@@ -84,8 +95,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
 
-                        // Customer endpoints (to be implemented)
-                        .requestMatchers("/api/customers/**").hasAnyRole("CUSTOMER", "ADMIN")
+                        // Customer endpoints - controlled by @PreAuthorize in controller
+                        // /api/customers/register - public (permitAll above)
+                        // /api/customers/me - CUSTOMER only
+                        // /api/customers/** - ADMIN only
                         .requestMatchers("/api/cart/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/orders/**").hasAnyRole("CUSTOMER", "STORE_MANAGER", "ADMIN")
 

@@ -52,6 +52,7 @@ public class OrderController {
 
     @PutMapping("/{id}/confirm")
     @PreAuthorize("hasRole('STORE_MANAGER') or hasRole('ADMIN')")
+    @Operation(summary = "Confirm Order", description = "Store manager confirms order after customer payment (STORE_MANAGER or ADMIN)")
     public ResponseEntity<OrderDTO> confirmOrder(@PathVariable UUID id) {
         OrderDTO order = orderService.confirmOrder(id);
         return ResponseEntity.ok(order);
@@ -59,6 +60,7 @@ public class OrderController {
 
     @PutMapping("/{id}/processing")
     @PreAuthorize("hasRole('STORE_MANAGER') or hasRole('ADMIN')")
+    @Operation(summary = "Mark Order as Processing", description = "Update order status to processing - store is preparing order (STORE_MANAGER or ADMIN)")
     public ResponseEntity<OrderDTO> markAsProcessing(@PathVariable UUID id) {
         OrderDTO order = orderService.markAsProcessing(id);
         return ResponseEntity.ok(order);
@@ -66,6 +68,7 @@ public class OrderController {
 
     @PutMapping("/{id}/ship")
     @PreAuthorize("hasRole('STORE_MANAGER') or hasRole('ADMIN')")
+    @Operation(summary = "Mark Order as Shipped", description = "Update order status to shipped - order is in transit (STORE_MANAGER or ADMIN)")
     public ResponseEntity<OrderDTO> markAsShipped(@PathVariable UUID id) {
         OrderDTO order = orderService.markAsShipped(id);
         return ResponseEntity.ok(order);
@@ -81,6 +84,7 @@ public class OrderController {
 
     @PutMapping("/{id}/cancel")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('STORE_MANAGER') or hasRole('ADMIN')")
+    @Operation(summary = "Cancel Order", description = "Cancel order with reason. Can be done by customer or store manager")
     public ResponseEntity<OrderDTO> cancelOrder(
             @PathVariable UUID id,
             @RequestParam String reason) {
@@ -91,6 +95,7 @@ public class OrderController {
 
     @GetMapping("/customer/{customerId}")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
+    @Operation(summary = "Get Customer's Orders", description = "Get all orders for a specific customer with pagination (CUSTOMER or ADMIN)")
     public ResponseEntity<Page<OrderDTO>> getCustomerOrders(
             @PathVariable UUID customerId,
             @RequestParam(defaultValue = "0") int page,
@@ -107,6 +112,7 @@ public class OrderController {
 
     @GetMapping("/store/{storeId}")
     @PreAuthorize("hasRole('STORE_MANAGER') or hasRole('ADMIN')")
+    @Operation(summary = "Get Store's Orders", description = "Get all orders for a specific store, optionally filtered by status (STORE_MANAGER or ADMIN)")
     public ResponseEntity<Page<OrderDTO>> getStoreOrders(
             @PathVariable UUID storeId,
             @RequestParam(required = false) OrderStatus status,
@@ -124,6 +130,7 @@ public class OrderController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('STORE_MANAGER') or hasRole('ADMIN')")
+    @Operation(summary = "Get Order Details", description = "Get detailed information about a specific order")
     public ResponseEntity<OrderDTO> getOrder(@PathVariable UUID id) {
         OrderDTO order = orderService.getOrder(id);
         return ResponseEntity.ok(order);
@@ -147,6 +154,7 @@ public class OrderController {
     }
 
     @GetMapping("/store/{storeId}/ratings")
+    @Operation(summary = "Get Store Ratings", description = "Get all ratings and reviews for a specific store")
     public ResponseEntity<Page<StoreRatingDTO>> getStoreRatings(
             @PathVariable UUID storeId,
             @RequestParam(defaultValue = "0") int page,

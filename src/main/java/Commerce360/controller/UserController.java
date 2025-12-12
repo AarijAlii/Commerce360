@@ -38,6 +38,10 @@ public class UserController {
     }
 
     @GetMapping("/me")
+    @Operation(
+        summary = "Get Current User Profile",
+        description = "Get currently logged-in user's profile information"
+    )
     public ResponseEntity<?> getCurrentUser() {
         try {
             User user = userService.getCurrentUser();
@@ -62,6 +66,10 @@ public class UserController {
 
     @GetMapping("/pending")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+        summary = "Get Pending Users",
+        description = "Get all users awaiting approval (ADMIN only)"
+    )
     public ResponseEntity<List<UserDTO>> getPendingUsers() {
         List<User> pendingUsers = userService.getPendingUsers();
         List<UserDTO> pendingUserDTOs = pendingUsers.stream()
@@ -72,6 +80,10 @@ public class UserController {
 
     @GetMapping("/approved")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+        summary = "Get Approved Users",
+        description = "Get all approved users (ADMIN only)"
+    )
     public ResponseEntity<List<UserDTO>> getApprovedUsers() {
         List<User> approvedUsers = userService.getApprovedUsers();
         List<UserDTO> approvedUserDTOs = approvedUsers.stream()
@@ -82,6 +94,10 @@ public class UserController {
 
     @GetMapping("/rejected")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+        summary = "Get Rejected Users",
+        description = "Get all rejected user registrations (ADMIN only)"
+    )
     public ResponseEntity<List<UserDTO>> getRejectedUsers() {
         List<User> rejectedUsers = userService.getRejectedUsers();
         List<UserDTO> rejectedUserDTOs = rejectedUsers.stream()
@@ -92,6 +108,10 @@ public class UserController {
 
     @PostMapping("/{userId}/approve")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+        summary = "Approve User",
+        description = "Approve pending user registration (ADMIN only)"
+    )
     public ResponseEntity<UserDTO> approveUser(@PathVariable UUID userId) {
         User approvedUser = userService.approveUser(userId);
         return ResponseEntity.ok(UserDTO.fromEntity(approvedUser));
@@ -99,18 +119,30 @@ public class UserController {
 
     @PostMapping("/{userId}/reject")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+        summary = "Reject User",
+        description = "Reject user registration with reason (ADMIN only)"
+    )
     public ResponseEntity<UserDTO> rejectUser(@PathVariable UUID userId, @RequestBody String reason) {
         User rejectedUser = userService.rejectUser(userId, reason);
         return ResponseEntity.ok(UserDTO.fromEntity(rejectedUser));
     }
 
     @PutMapping("/{userId}")
+    @Operation(
+        summary = "Update User",
+        description = "Update user information"
+    )
     public ResponseEntity<UserDTO> updateUser(@PathVariable UUID userId, @RequestBody User updatedUser) {
         User user = userService.updateUser(userId, updatedUser);
         return ResponseEntity.ok(UserDTO.fromEntity(user));
     }
 
     @DeleteMapping("/{userId}")
+    @Operation(
+        summary = "Delete User",
+        description = "Delete user account"
+    )
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.deleteUser(userId);
         return ResponseEntity.ok().build();
@@ -118,6 +150,10 @@ public class UserController {
 
     // DELETE CURRENT USER'S ACCOUNT
     @DeleteMapping("/me")
+    @Operation(
+        summary = "Delete Own Account",
+        description = "Delete currently logged-in user's account"
+    )
     public ResponseEntity<?> deleteCurrentUser() {
         try {
             userService.deleteUser(securityContextUtil.getCurrentUserId());

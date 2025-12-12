@@ -43,6 +43,10 @@ public class PurchaseOrderController {
 
     @PutMapping("/{id}/submit")
     @PreAuthorize("hasRole('STORE_MANAGER')")
+    @Operation(
+        summary = "Submit Purchase Order",
+        description = "Submit draft PO for supplier review. Changes status from DRAFT to PENDING (STORE_MANAGER only)"
+    )
     public ResponseEntity<PurchaseOrderDTO> submitPurchaseOrder(@PathVariable UUID id) {
         PurchaseOrderDTO purchaseOrder = purchaseOrderService.submitPurchaseOrder(id);
         return ResponseEntity.ok(purchaseOrder);
@@ -62,6 +66,10 @@ public class PurchaseOrderController {
 
     @PutMapping("/{id}/reject")
     @PreAuthorize("hasRole('SUPPLIER')")
+    @Operation(
+        summary = "Reject Purchase Order",
+        description = "Supplier rejects order with reason. Status changes to REJECTED (SUPPLIER only)"
+    )
     public ResponseEntity<PurchaseOrderDTO> rejectPurchaseOrder(@PathVariable UUID id, @RequestParam String reason) {
         PurchaseOrderDTO purchaseOrder = purchaseOrderService.rejectPurchaseOrder(id, reason);
         return ResponseEntity.ok(purchaseOrder);
@@ -69,6 +77,10 @@ public class PurchaseOrderController {
 
     @PutMapping("/{id}/ship")
     @PreAuthorize("hasRole('SUPPLIER')")
+    @Operation(
+        summary = "Mark as Shipped",
+        description = "Supplier marks order as shipped with tracking number. Status changes to SHIPPED (SUPPLIER only)"
+    )
     public ResponseEntity<PurchaseOrderDTO> markAsShipped(@PathVariable UUID id, @RequestParam String trackingNumber) {
         PurchaseOrderDTO purchaseOrder = purchaseOrderService.markAsShipped(id, trackingNumber);
         return ResponseEntity.ok(purchaseOrder);
@@ -93,6 +105,10 @@ public class PurchaseOrderController {
 
     @GetMapping("/store/{storeId}")
     @PreAuthorize("hasRole('STORE_MANAGER') or hasRole('ADMIN')")
+    @Operation(
+        summary = "Get Store's Purchase Orders",
+        description = "Get all purchase orders for a specific store, optionally filtered by status (STORE_MANAGER or ADMIN)"
+    )
     public ResponseEntity<Page<PurchaseOrderDTO>> getPurchaseOrdersByStore(
             @PathVariable UUID storeId,
             @RequestParam(required = false) PurchaseOrderStatus status,
@@ -110,6 +126,10 @@ public class PurchaseOrderController {
 
     @GetMapping("/supplier/{supplierId}")
     @PreAuthorize("hasRole('SUPPLIER') or hasRole('ADMIN')")
+    @Operation(
+        summary = "Get Supplier's Purchase Orders",
+        description = "Get all purchase orders for a specific supplier, optionally filtered by status (SUPPLIER or ADMIN)"
+    )
     public ResponseEntity<Page<PurchaseOrderDTO>> getPurchaseOrdersBySupplier(
             @PathVariable UUID supplierId,
             @RequestParam(required = false) PurchaseOrderStatus status,
@@ -127,6 +147,10 @@ public class PurchaseOrderController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('STORE_MANAGER') or hasRole('SUPPLIER') or hasRole('ADMIN')")
+    @Operation(
+        summary = "Get Purchase Order Details",
+        description = "Get detailed information about a specific purchase order (STORE_MANAGER, SUPPLIER, or ADMIN)"
+    )
     public ResponseEntity<PurchaseOrderDTO> getPurchaseOrder(@PathVariable UUID id) {
         PurchaseOrderDTO purchaseOrder = purchaseOrderService.getPurchaseOrder(id);
         return ResponseEntity.ok(purchaseOrder);
