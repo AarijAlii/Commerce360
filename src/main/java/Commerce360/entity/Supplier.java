@@ -2,7 +2,6 @@ package Commerce360.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -36,9 +35,6 @@ public class Supplier {
     @Column
     private String contact;
 
-    @Column
-    private String email;
-
     @Column(columnDefinition = "TEXT")
     private String address;
 
@@ -48,18 +44,8 @@ public class Supplier {
     @Column
     private String country;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ApprovalStatus approvalStatus;
-
-    @Column
-    private LocalDateTime registrationDate;
-
-    @Column
-    private LocalDateTime approvalDate;
-
-    @Column
-    private String rejectionReason;
+    // Approval status managed via User entity (user.approvalStatus,
+    // user.approvalDate, etc.)
 
     @Column
     @Builder.Default

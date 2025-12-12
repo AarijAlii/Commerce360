@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.UUID;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -46,20 +44,8 @@ public class User {
 
     private String rejectionReason;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<Store> ownedStores = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(name = "user_managed_stores", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "store_id"))
-    @Builder.Default
-    private List<Store> managedStores = new ArrayList<>();
-
-    public List<Store> getManagedStores() {
-        return managedStores;
-    }
-
-    public void setManagedStores(List<Store> managedStores) {
-        this.managedStores = managedStores;
-    }
+    // Role-specific fields moved to respective entities:
+    // - Customer: shippingAddress, totalOrders, etc.
+    // - Supplier: companyName, businessLicense, etc.
+    // - StoreManager: ownedStores, managedStores
 }

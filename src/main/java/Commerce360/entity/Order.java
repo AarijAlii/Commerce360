@@ -82,7 +82,11 @@ public class Order {
     @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @Column
+    // Payment relationship
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private Payment payment;
+
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Column

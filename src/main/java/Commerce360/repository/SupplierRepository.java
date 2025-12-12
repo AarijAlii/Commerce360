@@ -6,11 +6,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import Commerce360.entity.Supplier;
+import Commerce360.entity.User;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface SupplierRepository extends JpaRepository<Supplier, UUID> {
-    Page<Supplier> findByCompanyNameContainingIgnoreCaseOrEmailContainingIgnoreCase(String name, String email,
-            Pageable pageable);
+    // Search by company name or user email
+    Page<Supplier> findByCompanyNameContainingIgnoreCaseOrUser_EmailContainingIgnoreCase(
+            String companyName, String email, Pageable pageable);
+
+    Optional<Supplier> findByUser(User user);
+
+    Optional<Supplier> findByUser_Id(UUID userId);
 }

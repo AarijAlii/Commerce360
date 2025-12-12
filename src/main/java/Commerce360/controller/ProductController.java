@@ -67,6 +67,7 @@ public class ProductController {
 
     // GET PRODUCTS BY CATEGORY
     @GetMapping("/category/{category}")
+    @Operation(summary = "Get Products by Category", description = "Filter products by category (e.g., ELECTRONICS, FOOD, CLOTHING)")
     public ResponseEntity<Page<ProductDTO>> getProductsByCategory(
             @PathVariable String category,
             @RequestParam(defaultValue = "0") int page,
@@ -89,6 +90,7 @@ public class ProductController {
 
     // SEARCH PRODUCTS
     @GetMapping("/search")
+    @Operation(summary = "Search Products", description = "Search products by name, SKU, or barcode with pagination")
     public ResponseEntity<Page<ProductDTO>> searchProducts(
             @RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
@@ -111,6 +113,7 @@ public class ProductController {
 
     // GET PRODUCTS BY SUPPLIER
     @GetMapping("/supplier/{supplierId}")
+    @Operation(summary = "Get Products by Supplier", description = "Get all products offered by a specific supplier")
     public ResponseEntity<Page<ProductDTO>> getProductsBySupplier(
             @PathVariable UUID supplierId,
             @RequestParam(defaultValue = "0") int page,
@@ -133,6 +136,7 @@ public class ProductController {
 
     // DYNAMIC FILTERED PRODUCTS
     @GetMapping("/filter")
+    @Operation(summary = "Advanced Product Filter", description = "Filter products by multiple criteria: category, supplier, and search query")
     public ResponseEntity<Page<ProductDTO>> getFilteredProducts(
             @RequestParam(required = false) String category,
             @RequestParam(required = false) UUID supplierId,
@@ -157,6 +161,7 @@ public class ProductController {
 
     // GET PRODUCT BY ID
     @GetMapping("/{id}")
+    @Operation(summary = "Get Product Details", description = "Get detailed information about a specific product by ID")
     public ResponseEntity<ProductDTO> getProductById(@PathVariable UUID id) {
         return productService.getProductById(id)
                 .map(ProductDTO::fromEntity)
@@ -167,6 +172,7 @@ public class ProductController {
     // CREATE A PRODUCT
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Create Product (Admin)", description = "Add new product to global catalog (ADMIN only)")
     public ResponseEntity<ProductDTO> createProduct(@RequestBody Product product) {
         Product createdProduct = productService.createProduct(product);
         return ResponseEntity.ok(ProductDTO.fromEntity(createdProduct));
@@ -175,6 +181,7 @@ public class ProductController {
     // UPDATE A PRODUCT
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Update Product (Admin)", description = "Update product information in global catalog (ADMIN only)")
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable UUID id, @RequestBody Product product) {
         return productService.updateProduct(id, product)
                 .map(ProductDTO::fromEntity)
@@ -185,6 +192,7 @@ public class ProductController {
     // DELETE A PRODUCT
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Delete Product (Admin)", description = "Remove product from global catalog (ADMIN only)")
     public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
         if (productService.deleteProduct(id)) {
             return ResponseEntity.ok().build();

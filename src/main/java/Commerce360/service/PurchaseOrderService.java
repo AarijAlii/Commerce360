@@ -55,7 +55,7 @@ public class PurchaseOrderService {
                 .orElseThrow(() -> new RuntimeException("Supplier not found"));
 
         // Validate supplier is approved
-        if (supplier.getApprovalStatus() != ApprovalStatus.APPROVED) {
+        if ( supplier.getUser().getApprovalStatus() != ApprovalStatus.APPROVED) {
             throw new RuntimeException("Supplier is not approved");
         }
 

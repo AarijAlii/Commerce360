@@ -49,6 +49,10 @@ public class AdminController {
     }
 
     @GetMapping("/users/role/{role}")
+    @Operation(
+        summary = "Get Users by Role",
+        description = "Filter users by role (CUSTOMER, SUPPLIER, STORE_MANAGER, ADMIN) (ADMIN only)"
+    )
     public ResponseEntity<Page<UserDTO>> getUsersByRole(
             @PathVariable UserRole role,
             @RequestParam(defaultValue = "0") int page,
@@ -64,6 +68,10 @@ public class AdminController {
     }
 
     @GetMapping("/users/status/{status}")
+    @Operation(
+        summary = "Get Users by Approval Status",
+        description = "Filter users by approval status (PENDING, APPROVED, REJECTED) (ADMIN only)"
+    )
     public ResponseEntity<Page<UserDTO>> getUsersByStatus(
             @PathVariable ApprovalStatus status,
             @RequestParam(defaultValue = "0") int page,
@@ -80,21 +88,11 @@ public class AdminController {
 
     // ========== Approval Workflows ==========
 
-    @GetMapping("/approvals/pending")
-    public ResponseEntity<Page<UserDTO>> getPendingApprovals(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "registrationDate") String sortBy,
-            @RequestParam(defaultValue = "ASC") String sortDir) {
-
-        Sort sort = sortDir.equalsIgnoreCase("ASC") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        Page<UserDTO> users = adminService.getPendingApprovals(pageable);
-        return ResponseEntity.ok(users);
-    }
-
     @GetMapping("/approvals/pending/suppliers")
+    @Operation(
+        summary = "Get Pending Supplier Registrations",
+        description = "Get all suppliers awaiting approval (ADMIN only)"
+    )
     public ResponseEntity<Page<UserDTO>> getPendingSuppliers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -105,6 +103,10 @@ public class AdminController {
     }
 
     @GetMapping("/approvals/pending/store-managers")
+    @Operation(
+        summary = "Get Pending Store Manager Registrations",
+        description = "Get all store managers awaiting approval (ADMIN only)"
+    )
     public ResponseEntity<Page<UserDTO>> getPendingStoreManagers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -128,6 +130,10 @@ public class AdminController {
     }
 
     @PutMapping("/users/{userId}/reject")
+    @Operation(
+        summary = "Reject User Registration",
+        description = "Reject pending user with reason. Tracks rejection details (ADMIN only)"
+    )
     public ResponseEntity<UserDTO> rejectUser(
             @PathVariable UUID userId,
             @RequestParam String reason) {
@@ -146,12 +152,20 @@ public class AdminController {
     }
 
     @GetMapping("/statistics/users")
+    @Operation(
+        summary = "Get User Statistics",
+        description = "Get user statistics by role and status (ADMIN only)"
+    )
     public ResponseEntity<Map<String, Object>> getUserStatistics() {
         Map<String, Object> stats = adminService.getUserStatistics();
         return ResponseEntity.ok(stats);
     }
 
     @GetMapping("/statistics/activity")
+    @Operation(
+        summary = "Get Recent Activity",
+        description = "Get recent platform activity and user actions (ADMIN only)"
+    )
     public ResponseEntity<Map<String, Object>> getRecentActivity() {
         Map<String, Object> activity = adminService.getRecentActivity();
         return ResponseEntity.ok(activity);

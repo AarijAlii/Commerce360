@@ -8,6 +8,8 @@ import Commerce360.repository.CustomerRepository;
 import Commerce360.repository.UserRepository;
 import Commerce360.security.SecurityContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,7 +101,6 @@ public class CustomerService {
     public CustomerDTO getCurrentCustomerProfile() {
         User currentUser = securityContextUtil.getCurrentUser()
                 .orElseThrow(() -> new RuntimeException("Not authenticated"));
-
         Customer customer = customerRepository.findByUser(currentUser)
                 .orElseThrow(() -> new RuntimeException("Customer profile not found"));
 
@@ -114,5 +115,39 @@ public class CustomerService {
         customer.setTotalOrders(customer.getTotalOrders() + 1);
         customer.setLastOrderDate(LocalDateTime.now());
         customerRepository.save(customer);
+    }
+
+    /**
+     * Customer updates own profile
+     */
+    @Transactional
+    public CustomerDTO updateOwnProfile(String phoneNumber, String shippingAddress,
+            String billingAddress, String city, String postalCode) {
+        User currentUser = securityContextUtil.getCurrentUser()
+                .orElseThrow(() -> new RuntimeException("Not authenticated"));
+        
+        Customer customer = customerRepository.findByUser(currentUser)
+                .orElseThrow(() -> new RuntimeException("Customer profile not found"));
+
+        if (phoneNumber != null)
+            customer.setPhoneNumber(phoneNumber);
+        if (shippingAddress != null)
+            customer.setShippingAddress(shippingAddress);
+        if (billingAddress != null)
+            customer.setBillingAddress(billingAddress);
+        if (city != null)
+            customer.setCity(city);
+        if (postalCode != null)
+            customer.setPostalCode(postalCode);
+
+        customer = customerRepository.save(customer);
+        return CustomerDTO.fromEntity(customer);
+    }
+
+    /**
+     * Get all customers (ADMIN only)
+     */
+    public Page<Customer> getAllCustomers(int page, int size) {
+        return customerRepository.findAll(PageRequest.of(page, size));
     }
 }

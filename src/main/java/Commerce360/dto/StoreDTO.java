@@ -27,7 +27,9 @@ public class StoreDTO {
                 .id(store.getId())
                 .name(store.getName())
                 .location(store.getLocation())
-                .owner(store.getOwner() != null ? UserDTO.fromEntity(store.getOwner()) : null)
+                .owner(store.getOwner() != null && store.getOwner().getUser() != null
+                        ? UserDTO.fromEntity(store.getOwner().getUser())
+                        : null)
                 .build();
     }
 }

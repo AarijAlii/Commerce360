@@ -51,11 +51,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
     public User registerUser(String email, String password, UserRole role, String firstName, String lastName) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("Email already registered");
         }
 
+        // Create User only (role entities created by role-specific services)
         User user = User.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))

@@ -10,5 +10,10 @@ import java.util.UUID;
 
 @Repository
 public interface StoreRepository extends JpaRepository<Store, UUID> {
-    List<Store> findByOwnerId(UUID ownerId);
+
+    /**
+     * Find stores by StoreManager (owner) ID
+     * Note: owner is now StoreManager entity, not User
+     */
+    List<Store> findByOwnerId(UUID ownerId); // ownerId is StoreManager.id
 }
